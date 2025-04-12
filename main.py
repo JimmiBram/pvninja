@@ -1,13 +1,40 @@
 import paho.mqtt.client as mqtt
 import configparser
+import os
 import sqlite3
 import time
 import threading
 from datetime import datetime
 
-# --- Læs konfiguration ---
+# --- Automatisk oprettelse af config.ini hvis den ikke findes ---
+CONFIG_FILE = "config.ini"
+
+def create_config_interactively():
+    print("⚙️ Første gang? Lad os opsætte din MQTT forbindelse:")
+    broker = input("🔌 MQTT Broker (fx 192.168.1.10): ").strip()
+    port = input("🔢 MQTT Port (typisk 1883): ").strip()
+    username = input("👤 Brugernavn: ").strip()
+    password = input("🔑 Adgangskode: ").strip()
+
+    config = configparser.ConfigParser()
+    config["mqtt"] = {
+        "broker": broker,
+        "port": port,
+        "username": username,
+        "password": password
+    }
+
+    with open(CONFIG_FILE, "w") as configfile:
+        config.write(configfile)
+    print("✅ config.ini gemt!")
+
+# Opret config hvis den ikke findes
+if not os.path.exists(CONFIG_FILE):
+    create_config_interactively()
+
+# --- Læs config.ini ---
 config = configparser.ConfigParser()
-config.read("config.ini")
+config.read(CONFIG_FILE)
 
 MQTT_BROKER = config.get("mqtt", "broker")
 MQTT_PORT = config.getint("mqtt", "port")
