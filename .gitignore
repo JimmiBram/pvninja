@@ -31,3 +31,6 @@ venv/
 
 # CSV data files
 *.csv
+
+# The database file
+*.db
