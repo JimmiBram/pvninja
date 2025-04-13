@@ -197,6 +197,50 @@ def check_and_print():
             print(f"📊 Soloverskud: {surplus:.1f} W")
             print(f"🧮 Anbefalet Export Limit for at beskytte batteriet: {recommended_export_limit:.0f} %")
 
+
+
+
+            # --- SYSTEMKONTROL ALGORITME ---
+            car_home = True  # <- sæt denne baseret på input eller sensor
+            export_price = 6  # <- hent aktuel pris hvis muligt
+
+            if surplus <= 0:
+                print("🔄 Brug paneler + batteri til at dække husets behov")
+                # evt. mqtt_publish("car/charging", "off")
+                # evt. mqtt_publish("export_limit", "0")
+
+            elif battery_soc < 100:
+                print("⚡ Oplader batteriet med overskud")
+                # mqtt_publish("battery/charging", "on")
+                # mqtt_publish("export_limit", "0")
+
+            elif battery_soc >= 100:
+                if car_home:
+                    print("🚗 Elbil er hjemme – oplad med overskud")
+                    car_amp = int(surplus / 230)
+                    print(f"➡️ Justerer bil-ladning til ca. {car_amp} A")
+                    # mqtt_publish("car/charging", "on")
+                    # mqtt_publish("car/charging_ampere", str(car_amp))
+                    # mqtt_publish("export_limit", "0")
+                elif export_price > 5:
+                    print("🌍 Eksporterer overskud (pris > 5 øre)")
+                    export_pct = min(max(int(recommended_export_limit), 0), 100)
+                    print(f"➡️ Sætter eksportgrænse til {export_pct} %")
+                    # mqtt_publish("car/charging", "off")
+                    # mqtt_publish("export_limit", str(export_pct))
+                else:
+                    print("🛑 Ingen elbil hjemme og eksportpris for lav – gør ingenting")
+                    # mqtt_publish("car/charging", "off")
+                    # mqtt_publish("export_limit", "0")
+
+
+
+
+
+
+
+
+
             # Log til database hver 10. sekund
             current_time = time.time()
             if current_time - last_db_log_time >= 10:
