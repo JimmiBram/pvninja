@@ -57,6 +57,9 @@ data = {
     "export_limit": None
 }
 
+# Track last database log time
+last_db_log_time = 0
+
 # --- MQTT topics ---
 topics = {
     "pv_power_1": "solar_assistant/inverter_1/pv_power_1/state",
@@ -112,6 +115,8 @@ def log_to_db(log_data):
 
 # --- Beregning og visning ---
 def check_and_print():
+    global last_db_log_time
+    
     if all(data[k] is not None for k in data):
         try:
             pv_power_1 = float(data["pv_power_1"])
@@ -137,7 +142,8 @@ def check_and_print():
                 recommended_export_limit = (surplus / potential_production) * 100
             else:
                 recommended_export_limit = 0
-
+                
+            os.system('cls' if os.name == 'nt' else 'clear')
             print("\n--- Live fra SolarAssistant ---")
             print(f"🧠 Inverter mode: {inverter_mode}")
             print(f"🔋 Batteri SoC: {battery_soc:.1f} %")
@@ -150,14 +156,17 @@ def check_and_print():
             print(f"📊 Soloverskud: {surplus:.1f} W")
             print(f"🧮 Anbefalet Export Limit for at beskytte batteriet: {recommended_export_limit:.0f} %")
 
-            # Log til database
-            timestamp = datetime.now().isoformat()
-            log_row = (
-                timestamp, inverter_mode, battery_soc, solar_production,
-                potential_production, load_power, battery_power,
-                grid_power, export_limit, surplus, recommended_export_limit
-            )
-            log_to_db(log_row)
+            # Log til database hver 10. sekund
+            current_time = time.time()
+            if current_time - last_db_log_time >= 10:
+                timestamp = datetime.now().isoformat()
+                log_row = (
+                    timestamp, inverter_mode, battery_soc, solar_production,
+                    potential_production, load_power, battery_power,
+                    grid_power, export_limit, surplus, recommended_export_limit
+                )
+                log_to_db(log_row)
+                last_db_log_time = current_time
 
         except Exception as e:
             print("⚠️ Fejl i beregning:", e)
