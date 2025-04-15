@@ -1,0 +1,3 @@
+"""PVNinja - Smart Solar Controller"""
+
+__version__ = "0.1.0"

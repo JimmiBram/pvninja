@@ -1,4 +1,4 @@
 paho-mqtt>=1.6.1
 flask>=2.0.0
 Flask-SocketIO>=5.5.1
-nordpool>0.4.5
+nordpool>=0.5.0
