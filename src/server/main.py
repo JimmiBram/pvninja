@@ -3,11 +3,25 @@ from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from pathlib import Path
 
-
 app = FastAPI()
 
-templates = Jinja2Templates(directory=str(Path(__file__).parent.parent / "ui" / "templates"))
+BASE_DIR = Path(__file__).resolve().parent.parent  # points to project root (pvninja)
+templates = Jinja2Templates(directory=str(BASE_DIR / "ui" / "templates"))
 
 @app.get("/", response_class=HTMLResponse)
-async def home(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request, "title": "PV Ninja"})
+async def read_index(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
+
+@app.get("/stream")
+async def stream():
+    async def event_generator():
+        for i in range(10):
+            yield {"data": f"Message {i}"}
+            await asyncio.sleep(1)  # simulate some work
+    return EventSourceResponse(event_generator())
+
+@app.post("/submit")
+async def receive_data(request: Request):
+    data = await request.json()
+    print("Received from frontend:", data)
+    return {"status": "ok", "echo": data}
