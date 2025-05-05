@@ -25,6 +25,8 @@ var/
 *.egg
 venv/
 .venv/
+.pyc
+.DS_Store
 
 # Logs
 *.log

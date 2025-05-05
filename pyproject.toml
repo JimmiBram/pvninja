@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "pvninja"
+version = "0.1.0"
+description = ""
+authors = ["Your Name <you@example.com>"]
+packages = [
+  { include = "pvninja", from = "src" },
+  { include = "server", from = "src" },
+  { include = "ui", from = "src" }
+]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.110"
+uvicorn = "^0.29"
+jinja2 = "^3.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
