@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>PVNINJA Dashboard</title>
+  <script>
+    let log = (txt) => document.querySelector('#out').textContent += txt + "\n";
+
+    function connect() {
+      const ws = new WebSocket(`ws://${location.hostname}:8765`);
+      ws.onopen  = () => log("🟢 connected");
+      ws.onclose = () => log("🔴 disconnected");
+      ws.onmessage = (ev) => {
+        const msg = JSON.parse(ev.data);
+        if (msg.type === "tick") log(`tick: ${msg.value}s`);
+      };
+      document.querySelector('#btn').onclick = () => {
+        ws.send(JSON.stringify({type:"cmd", action:"button_pressed"}));
+        log("command sent");
+      };
+    }
+    window.onload = connect;
+  </script>
+  <style>body{font-family:sans-serif}</style>
+</head>
+<body>
+  <h1>PVNINJA</h1>
+  <button id="btn">Send command</button>
+  <pre id="out"></pre>
+</body>
+</html>

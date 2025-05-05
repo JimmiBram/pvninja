@@ -1,25 +1,21 @@
 [tool.poetry]
 name = "pvninja"
 version = "0.1.0"
-description = ""
-authors = ["Your Name <you@example.com>"]
-packages = [
-  { include = "pvninja", from = "src" },
-  { include = "server", from = "src" },
-  { include = "ui", from = "src" }
-]
+description = "Full automation on top of SolarAssistant's MQTT, for Growatt TL-X/XH, TL3-XH"
+authors = ["Jimmi Bram"]
+license = "Apache-2.0"
+readme = "README.md"
+packages = [{ include = "pvninja", from = "src" }, { include = "server", from = "src" }, { include = "ui", from = "src" }]
 
 [tool.poetry.dependencies]
 python = "^3.11"
-fastapi = "^0.115.12"
-sse-starlette = "^2.3.4"
-uvicorn = "^0.34.2"
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+fastapi = "^0.111"
+uvicorn = { extras = ["standard"], version = "^0.30" }
+gunicorn = "^22.0"
+websockets = "^12.0"
+pydantic = "^2.7"
 
 [tool.poetry.scripts]
-dev = "uvicorn:src.server.main:app --reload"
-
-
+start-server = "pvninja.scripts.start_server:main"
+start-ui     = "pvninja.scripts.start_ui:main"
+start-all    = "pvninja.scripts.start_all:main"
