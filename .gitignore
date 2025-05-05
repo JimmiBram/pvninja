@@ -36,3 +36,6 @@ venv/
 
 # The database file
 *.db
+
+# CONFIG
+config.json
